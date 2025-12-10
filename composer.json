@@ -1,0 +1,13 @@
+{
+  "name": "tpk/touche-pas-au-klaxon",
+  "description": "Application de covoiturage interne",
+  "require": {
+    "php": ">=8.1",
+    "izniburak/router": "^3.1"
+  },
+  "autoload": {
+    "psr-4": {
+      "App\\": "app/"
+    }
+  }
+}
