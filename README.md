@@ -1,6 +1,6 @@
 # Touche pas au Klaxon
 
-Application web de covoiturage développée en PHP dans le cadre d’un projet pédagogique.
+Application web de covoiturage.
 
 ## Fonctionnalités
 - Consultation publique des trajets
