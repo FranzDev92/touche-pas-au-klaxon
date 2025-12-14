@@ -1,86 +1,69 @@
 <?php
-
 use App\Controller\TrajetController;
 use App\Controller\AuthController;
 use App\Controller\AdminController;
 
-/*
- * Page d’accueil : liste publique des trajets
- */
-$router->get('/', function () {
-    $c = new TrajetController();
-    $c->publicList();
+$router->get('/',function(){
+  (new TrajetController())->publicList();
 });
 
-/*
- * Détail d’un trajet (page “modal” avec Peter Parker & co)
- * URL attendue : /trajet/1, /trajet/2, etc.
- */
-$router->get('/trajet/{id}', function (int $id) {
-    $c = new TrajetController();
-    $c->details($id);
+$router->get('/login',function(){
+  (new AuthController())->loginForm();
+});
+$router->post('/login',function(){
+  (new AuthController())->login();
+});
+$router->get('/logout',function(){
+  (new AuthController())->logout();
 });
 
-/*
- * Authentification
- */
-$router->get('/login', function () {
-    $c = new AuthController();
-    $c->showLogin();
+$router->get('/trajet/create',function(){
+  (new TrajetController())->createForm();
+});
+$router->post('/trajet/store',function(){
+  (new TrajetController())->store();
 });
 
-$router->post('/login', function () {
-    $c = new AuthController();
-    $c->login();
+$router->get('/trajet',function(){
+  $id=isset($_GET['id'])?(int)$_GET['id']:0;
+  (new TrajetController())->details($id);
 });
 
-$router->get('/logout', function () {
-    $c = new AuthController();
-    $c->logout();
+$router->get('/admin',function(){
+  (new TrajetController())->adminList();
+});
+$router->get('/admin/trajets',function(){
+  (new TrajetController())->adminList();
 });
 
-/*
- * Espace admin
- * Toutes ces routes passent par AdminController et requireAdmin()
- */
-
-// page d’accueil de l’admin = liste des trajets
-$router->get('/admin', function () {
-    $c = new AdminController();
-    $c->trajets();
+/* EDIT */
+$router->get('/admin/trajet/edit',function(){
+  $id=isset($_GET['id'])?(int)$_GET['id']:0;
+  (new TrajetController())->editForm($id);
+});
+$router->post('/admin/trajet/edit',function(){
+  $id=isset($_POST['id'])?(int)$_POST['id']:0;
+  (new TrajetController())->update($id);
 });
 
-$router->get('/admin/trajets', function () {
-    $c = new AdminController();
-    $c->trajets();
+/* DELETE */
+$router->get('/admin/trajet/delete',function(){
+  $id=isset($_GET['id'])?(int)$_GET['id']:0;
+  (new TrajetController())->delete($id);
 });
 
-// liste des utilisateurs
-$router->get('/admin/users', function () {
-    $c = new AdminController();
-    $c->users();
+$router->get('/admin/users',function(){
+  (new AdminController())->users();
 });
-
-// liste des agences
-$router->get('/admin/agences', function () {
-    $c = new AdminController();
-    $c->agences();
+$router->get('/admin/agences',function(){
+  (new AdminController())->agences();
 });
-
-// création d’agence
-$router->post('/admin/agences', function () {
-    $c = new AdminController();
-    $c->createAgence();
+$router->post('/admin/agences/create',function(){
+  (new AdminController())->createAgence();
 });
-
-// modification d’agence
-$router->post('/admin/agences/{id}', function (int $id) {
-    $c = new AdminController();
-    $c->updateAgence($id);
+$router->post('/admin/agences/{id}/update',function($id){
+  (new AdminController())->updateAgence((int)$id);
 });
-
-// suppression d’agence
-$router->post('/admin/agences/{id}/delete', function (int $id) {
-    $c = new AdminController();
-    $c->deleteAgence($id);
+$router->get('/admin/agences/{id}/delete',function($id){
+  (new AdminController())->deleteAgence((int)$id);
 });

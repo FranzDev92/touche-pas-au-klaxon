@@ -22,7 +22,7 @@ class UtilisateurModel extends BaseModel
     }
 
     /**
-     * Retourne tous les utilisateurs (pour la gestion admin)
+     * Retourne tous les utilisateurs (gestion admin)
      */
     public function findAllUsers(): array
     {

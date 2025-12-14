@@ -3,10 +3,7 @@ namespace App\Controller;
 
 use PDO;
 
-// IMPORTANT : on charge la fonction getPDO() définie dans config/database.php
-require_once __DIR__ . '/../../config/database.php';
-
-abstract class BaseController
+class BaseController
 {
     protected PDO $pdo;
 
@@ -15,24 +12,30 @@ abstract class BaseController
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
-
-        // fonction globale définie dans config/database.php
+        // getPDO() est défini dans config/database.php en global
         $this->pdo = \getPDO();
     }
 
     protected function render(string $view, array $params = []): void
     {
-        // variables disponibles dans la vue
+        // variables de la vue
         extract($params);
 
-        // messages flash
-        $flash = $_SESSION['flash'] ?? [];
+        // flash
+        $flash = $_SESSION['flash'] ?? null;
         unset($_SESSION['flash']);
 
-        // header + vue + footer
         require __DIR__ . '/../View/layout/header.php';
         require __DIR__ . '/../View/' . $view . '.php';
         require __DIR__ . '/../View/layout/footer.php';
+    }
+
+    protected function setFlash(string $type, string $message): void
+    {
+        $_SESSION['flash'] = [
+            'type'    => $type,
+            'message' => $message,
+        ];
     }
 
     protected function redirect(string $url): void
@@ -41,37 +44,21 @@ abstract class BaseController
         exit;
     }
 
-    protected function setFlash(string $type, string $message): void
-    {
-        $_SESSION['flash'][] = [
-            'type'    => $type,
-            'message' => $message,
-        ];
-    }
-
+    // Utilisateur simplement connecté 
     protected function requireLogin(): void
     {
         if (empty($_SESSION['user'])) {
-            $this->setFlash('danger', 'Vous devez être connecté pour accéder à cette page.');
+            $this->setFlash('warning', 'Veuillez vous connecter pour accéder à cette page.');
             $this->redirect('/login');
         }
     }
 
+    // Réservé aux admins
     protected function requireAdmin(): void
     {
-        $this->requireLogin();
-
-        $user = $_SESSION['user'] ?? null;
-
-        if (
-            !$user
-            || (
-                (int)($user['is_admin'] ?? 0) !== 1
-                && ($user['role'] ?? 'user') !== 'admin'
-            )
-        ) {
+        if (empty($_SESSION['user']) || empty($_SESSION['user']['is_admin'])) {
             $this->setFlash('danger', 'Accès réservé aux administrateurs.');
-            $this->redirect('/');
+            $this->redirect('/login');
         }
     }
 }
